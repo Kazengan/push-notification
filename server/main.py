@@ -136,7 +136,9 @@ async def stream_events(request: Request) -> StreamingResponse:
         "Content-Type": "text/event-stream",
     }
 
-    return StreamingResponse(event_generator(), media_type="text/event-stream", headers=headers)
+    response = StreamingResponse(event_generator(), media_type=None)
+    response.init_headers(headers)
+    return response
 
 
 def json_dumps(data: Any) -> str:
