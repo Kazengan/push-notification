@@ -127,10 +127,17 @@ async def stream_events(request: Request) -> StreamingResponse:
                     clients.remove(queue)
             Logger.info(f"{client_host} disconnected")
 
-    response = StreamingResponse(event_generator(), media_type="text/event-stream")
-    response.headers["Cache-Control"] = "no-cache"
-    response.headers["Connection"] = "keep-alive"
-    response.headers["Content-Type"] = "text/event-stream"
+    # The Android client bundled with the reference implementation performs a
+    # strict equality check on the Content-Type header, so we must send the
+    # exact "text/event-stream" value without the usual charset suffix.
+    headers = {
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+        "Content-Type": "text/event-stream",
+    }
+
+    response = StreamingResponse(event_generator(), media_type=None)
+    response.init_headers(headers)
     return response
 
 
