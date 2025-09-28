@@ -130,14 +130,14 @@ async def stream_events(request: Request) -> StreamingResponse:
     # The Android client bundled with the reference implementation performs a
     # strict equality check on the Content-Type header, so we must send the
     # exact "text/event-stream" value without the usual charset suffix.
-    headers = {
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive",
-        "Content-Type": "text/event-stream",
-    }
-
-    response = StreamingResponse(event_generator(), media_type=None)
-    response.init_headers(headers)
+    response = StreamingResponse(event_generator(), media_type="text/event-stream")
+    # Starlette appends a charset to text media types by default which breaks the
+    # Android client's strict equality check. Overwrite the header to the exact
+    # value it expects and keep the connection open like the reference Node server.
+    response.headers["Content-Type"] = "text/event-stream"
+    response.headers["Cache-Control"] = "no-cache"
+    response.headers["Connection"] = "keep-alive"
+    response.headers["X-Accel-Buffering"] = "no"
     return response
 
 
