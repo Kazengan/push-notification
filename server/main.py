@@ -9,9 +9,8 @@ from uuid import uuid4
 from dotenv import load_dotenv
 from fastapi import Body, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response
+from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel
-from sse_starlette.sse import EventSourceResponse
 
 from .icons.base64_icons import BASE64_ICONS
 from .middleware.logger import LoggerMiddleware
@@ -106,7 +105,7 @@ async def get_latest_notification() -> Response:
 
 
 @app.get("/events")
-async def stream_events(request: Request) -> EventSourceResponse:
+async def stream_events(request: Request) -> StreamingResponse:
     queue: asyncio.Queue[Notification] = asyncio.Queue()
 
     async with clients_lock:
@@ -116,10 +115,10 @@ async def stream_events(request: Request) -> EventSourceResponse:
 
     async def event_generator():
         try:
-            yield {"data": "Connected"}
+            yield "data: Connected\n\n"
             while True:
                 notification = await queue.get()
-                yield {"data": json_dumps(notification)}
+                yield f"data: {json_dumps(notification)}\n\n"
         except asyncio.CancelledError:
             raise
         finally:
@@ -128,7 +127,11 @@ async def stream_events(request: Request) -> EventSourceResponse:
                     clients.remove(queue)
             Logger.info(f"{client_host} disconnected")
 
-    return EventSourceResponse(event_generator())
+    response = StreamingResponse(event_generator(), media_type="text/event-stream")
+    response.headers["Cache-Control"] = "no-cache"
+    response.headers["Connection"] = "keep-alive"
+    response.headers["Content-Type"] = "text/event-stream"
+    return response
 
 
 def json_dumps(data: Any) -> str:
