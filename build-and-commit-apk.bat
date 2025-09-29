@@ -6,6 +6,8 @@ cd ..
 
 echo Adding APK to git...
 git add -f flutter_app/build/app/outputs/flutter-apk/app-release.apk
+git add -f flutter_app/android/app/release/app-release.apk 2>nul
 
 echo APK built and added to git successfully!
-echo File location: flutter_app/build/app/outputs/flutter-apk/app-release.apk
+echo Main APK location: flutter_app/build/app/outputs/flutter-apk/app-release.apk
+echo Alternative location: flutter_app/android/app/release/app-release.apk

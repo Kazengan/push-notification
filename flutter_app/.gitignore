@@ -68,3 +68,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+# But allow APK files to be committed
+!/android/app/release/*.apk
+# Also allow build outputs with APK files
+/build/
+!/build/app/
+/build/app/*
+!/build/app/outputs/
+/build/app/outputs/*
+!/build/app/outputs/flutter-apk/
+/build/app/outputs/flutter-apk/*
+!/build/app/outputs/flutter-apk/*.apk

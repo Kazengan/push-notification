@@ -243,6 +243,8 @@ flutter_app/build/app/outputs/*
 !flutter_app/build/app/outputs/flutter-apk/
 flutter_app/build/app/outputs/flutter-apk/*
 !flutter_app/build/app/outputs/flutter-apk/*.apk
+# Also ensure android release APKs are not ignored
+!flutter_app/android/app/release/*.apk
 flutter_app/coverage/
 flutter_app/ios/Flutter/ephemeral/
 flutter_app/ios/Flutter/App.framework

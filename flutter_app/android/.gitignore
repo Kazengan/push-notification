@@ -18,3 +18,5 @@ key.properties
 /app/debug/
 /app/profile/
 /app/release/
+# But allow APK files to be committed
+!/app/release/*.apk
