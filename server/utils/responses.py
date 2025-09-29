@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from .logger import Logger
 
 
-def send_response(status_code: int, data: Any | None = None) -> Response:
+def send_response(status_code: int, data: Any | None = None) -> JSONResponse:
     if isinstance(data, str):
         data = {"message": data}
 

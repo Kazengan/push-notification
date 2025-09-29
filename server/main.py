@@ -7,10 +7,11 @@ from typing import Any, Dict, List, Optional
 from uuid import uuid4
 
 from dotenv import load_dotenv
-from fastapi import Body, FastAPI, Request
+from fastapi import Body, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response, StreamingResponse
+from fastapi.responses import JSONResponse, Response, StreamingResponse
 from pydantic import BaseModel
+from fastapi.exceptions import RequestValidationError
 
 from .icons.base64_icons import BASE64_ICONS
 from .middleware.logger import LoggerMiddleware
@@ -177,3 +178,42 @@ def run() -> None:
 if __name__ == "__main__":
     run()
 
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    Logger.error(f"HTTPException {exc.status_code} on {request.url.path}: {exc.detail}")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "status": "error",
+            "message": str(exc.detail) if exc.detail else "HTTP error",
+            "path": request.url.path,
+        },
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    Logger.error(f"Validation error on {request.url.path}: {exc.errors()}")
+    return JSONResponse(
+        status_code=422,
+        content={
+            "status": "error",
+            "message": "Invalid request payload",
+            "errors": exc.errors(),
+            "path": request.url.path,
+        },
+    )
+
+
+@app.exception_handler(Exception)
+async def unexpected_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    Logger.exception(f"Unhandled error on {request.url.path}: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "status": "error",
+            "message": "Internal server error",
+            "detail": str(exc),
+            "path": request.url.path,
+        },
+    )
