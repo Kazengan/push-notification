@@ -1,3 +1,25 @@
+# ---- Project defaults ----
+
+# OS / Editor artifacts
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.code-workspace
+
+# Package managers & tooling caches
+node_modules/
+.pnpm-store/
+
+# Binary / log outputs
+*.log
+*.pid
+*.seed
+*.tmp
+*.bak
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -205,3 +227,24 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Flutter application (nested under flutter_app/)
+flutter_app/.dart_tool/
+flutter_app/.packages
+flutter_app/.pub/
+flutter_app/.flutter-plugins
+flutter_app/.flutter-plugins-dependencies
+flutter_app/build/
+flutter_app/coverage/
+flutter_app/ios/Flutter/ephemeral/
+flutter_app/ios/Flutter/App.framework
+flutter_app/ios/Flutter/Flutter.framework
+flutter_app/ios/Flutter/flutter_export_environment.sh
+flutter_app/macos/Flutter/ephemeral/
+flutter_app/windows/flutter/ephemeral/
+flutter_app/linux/flutter/ephemeral/
+flutter_app/web/.dart_tool/
+
+# Tooling outputs
+.dart_tool/
+.fleet/
