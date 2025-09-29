@@ -66,31 +66,70 @@ async def broadcast(notification: Notification) -> None:
             await queue.put(notification)
 
 
-@app.post("/")
-async def create_notification(payload: NotificationPayload = Body(...)) -> Response:
-    title = (payload.title or "").strip()
-    if not title:
-        return send_response(400, "'title' field is required")
+async def _create_and_send(
+    *,
+    title: Optional[str],
+    message: Optional[str] = None,
+    url: Optional[str] = None,
+    icon: Optional[str] = None,
+    color: Optional[str] = None,
+) -> tuple[bool, Notification | str]:
+    title_clean = (title or "").strip()
+    if not title_clean:
+        return False, "'title' field is required"
 
     notification: Notification = {
         "id": str(uuid4()),
-        "title": title,
-        "message": payload.message,
-        "url": payload.url,
-        "icon": payload.icon,
-        "color": payload.color,
+        "title": title_clean,
+        "message": message,
+        "url": url,
+        "icon": icon,
+        "color": color,
         "createdAt": _timestamp(),
     }
 
-    if payload.icon:
-        encoded_icon = load_icon(payload.icon)
+    if icon:
+        encoded_icon = load_icon(icon)
         if encoded_icon:
             notification["icon"] = encoded_icon
 
     notifications.append(notification)
     await broadcast(notification)
+    return True, notification
 
-    return send_response(201)
+
+@app.post("/")
+async def create_notification(payload: NotificationPayload = Body(...)) -> Response:
+    success, result = await _create_and_send(
+        title=payload.title,
+        message=payload.message,
+        url=payload.url,
+        icon=payload.icon,
+        color=payload.color,
+    )
+    if not success:
+        return send_response(400, result)
+    return send_response(201, result)
+
+
+@app.get("/send")
+async def create_notification_via_get(
+    title: str,
+    message: Optional[str] = None,
+    url: Optional[str] = None,
+    icon: Optional[str] = None,
+    color: Optional[str] = None,
+) -> Response:
+    success, result = await _create_and_send(
+        title=title,
+        message=message,
+        url=url,
+        icon=icon,
+        color=color,
+    )
+    if not success:
+        return send_response(400, result)
+    return send_response(200, result)
 
 
 @app.get("/")
