@@ -234,7 +234,15 @@ flutter_app/.packages
 flutter_app/.pub/
 flutter_app/.flutter-plugins
 flutter_app/.flutter-plugins-dependencies
-flutter_app/build/
+# Ignore specific build directories but keep APK output
+flutter_app/build/*
+!flutter_app/build/app/
+flutter_app/build/app/*
+!flutter_app/build/app/outputs/
+flutter_app/build/app/outputs/*
+!flutter_app/build/app/outputs/flutter-apk/
+flutter_app/build/app/outputs/flutter-apk/*
+!flutter_app/build/app/outputs/flutter-apk/*.apk
 flutter_app/coverage/
 flutter_app/ios/Flutter/ephemeral/
 flutter_app/ios/Flutter/App.framework
